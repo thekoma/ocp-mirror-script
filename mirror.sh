@@ -32,7 +32,8 @@ sync() {
 	     --to-release-image=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}-${ARCHITECTURE} 
 }
 delete() {
-	for tag in $(skopeo list-tags docker://registry.gpslab.club/ocpmirror |jq -c '.Tags[]'|grep ${OCP_RELEASE}-|sed 's/"//g'); do
+	tags=$(skopeo list-tags --authfile=${LOCAL_SECRET_JSON} docker://registry.gpslab.club/ocpmirror |jq -c '.Tags[]'|grep ${OCP_RELEASE}-|sed 's/"//g')
+	for tag in $tags; do
 		skopeo delete --authfile=${LOCAL_SECRET_JSON} docker://${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:$tag
 		if [ $? -eq 0 ]; then
 		      echo  "Deleted ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:$tag"

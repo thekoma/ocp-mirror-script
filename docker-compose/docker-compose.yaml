@@ -1,0 +1,26 @@
+version: '3.7'
+networks:
+  default:
+    external:
+      name: web
+services:
+  internalregistry:
+    image: registry
+    container_name: internalregistry
+    restart: always
+    environment: {}
+    volumes:
+      - /data/registry/internalregistry:/var/lib/registry
+      - ./configs/config.yaml:/etc/docker/registry/config.yml
+      - ./configs/htpasswd:/etc/docker/registry/htpasswd
+    port: 5000
+  registryui:
+    image: dockerio.gpslab.club/joxit/docker-registry-ui:static
+    container_name: registryui
+    restart: always
+    depends_on: ['internalregistry']
+    environment:
+      - REGISTRY_TITLE=Interal Registry
+      - REGISTRY_URL=http://internalregistry:5000
+      - DELETE_IMAGES=true
+    port: 80
